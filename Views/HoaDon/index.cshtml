@@ -1,0 +1,1028 @@
+@model IEnumerable<Fast_Food.Models.HoaDon>
+
+@{
+    ViewData["Title"] = "Danh sách Hóa Đơn";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<div class="invoice-container">
+    <div class="invoice-header">
+        <h2 class="invoice-title">Danh sách Hóa Đơn</h2>
+
+        <div class="invoice-actions">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm hóa đơn...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <div class="filter-container">
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="Chờ xác nhận">Chờ xác nhận</option>
+                    <option value="Đang xử lý">Đang xử lý</option>
+                    <option value="Hoàn thành">Hoàn thành</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                </select>
+
+                <select id="paymentFilter" class="filter-select">
+                    <option value="all">Tất cả thanh toán</option>
+                    <option value="Đã thanh toán">Đã thanh toán</option>
+                    <option value="Chưa thanh toán">Chưa thanh toán</option>
+                </select>
+
+                <button id="resetFilters" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-sync-alt"></i> Đặt lại
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div id="alertMessage" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table id="invoiceTable" class="table table-bordered table-hover invoice-table">
+            <thead>
+                <tr>
+                    <th class="sortable" data-sort="index">STT <i class="fas fa-sort"></i></th>
+                    <th>Món Ăn Đặt</th>
+                    <th class="sortable" data-sort="orderTime">Thời Gian Đặt <i class="fas fa-sort"></i></th>
+                    <th>Thời Gian Kết Thúc</th>
+                    <th class="sortable" data-sort="status">Trạng Thái Đơn Hàng <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-sort="payment">Trạng Thái Thanh Toán <i class="fas fa-sort"></i></th>
+                    <th>Số Điện Thoại</th>
+                    <th>Địa Chỉ Giao Hàng</th>
+                    <th class="sortable" data-sort="total">Tổng Tiền <i class="fas fa-sort"></i></th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Select((value, idx) => new { value, idx }))
+                {
+                    <tr class="invoice-row"
+                        data-order-status="@item.value.TrangThaiDonHang"
+                        data-payment-status="@item.value.TrangThaiThanhToan"
+                        data-order-time="@item.value.ThoiGianDat.ToString("yyyy-MM-ddTHH:mm:ss")"
+                        data-total="@item.value.TongTien"
+                        data-search="@(item.value.MaHoaDon + " " + item.value.SdtlienHe + " " + item.value.DiaChiGiaoHang)">
+                        <td class="text-center">@(item.idx + 1)</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@item.value.MaHoaDon" class="btn btn-info btn-sm view-details">
+                                <i class="fas fa-receipt"></i> Xem Chi Tiết
+                            </a>
+                        </td>
+                        <td class="text-center">@item.value.ThoiGianDat.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="text-center">
+                            @if (item.value.ThoiGianKetThuc.HasValue)
+                            {
+                                @item.value.ThoiGianKetThuc.Value.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa hoàn thành</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="status-badge @GetOrderStatusClass(item.value.TrangThaiDonHang)">
+                                @Html.Raw(GetOrderStatusIcon(item.value.TrangThaiDonHang)) @item.value.TrangThaiDonHang
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            @Html.Raw(
+                                     $"<span class='status-badge {(item.value.TrangThaiThanhToan == "Đã thanh toán" ? "status-paid" : "status-unpaid")}'>" +
+                                     $"{(item.value.TrangThaiThanhToan == "Đã thanh toán" ? "<i class='fas fa-check-circle'></i>" : "<i class='fas fa-clock'></i>")}" +
+                                     $" {item.value.TrangThaiThanhToan}</span>")
+                        </td>
+                        <td class="text-center">
+                            <a href="tel:@item.value.SdtlienHe" class="phone-link">
+                                <i class="fas fa-phone-alt"></i> @item.value.SdtlienHe
+                            </a>
+                        </td>
+                        <td>@item.value.DiaChiGiaoHang</td>
+                        <td class="text-center total-amount">@($"{item.value.TongTien:N0}")₫</td>
+                        <td class="text-center action-buttons">
+                            <div class="btn-group-vertical btn-group-sm">
+                                @if (item.value.TrangThaiDonHang == "Chờ xác nhận" || item.value.TrangThaiDonHang == "Đang xử lý")
+                                {
+                                    <button type="button" class="btn btn-danger cancel-order"
+                                            data-order-id="@item.value.MaHoaDon"
+                                            data-bs-toggle="tooltip"
+                                            title="Hủy đơn hàng này">
+                                        <i class="fas fa-ban"></i> Hủy Đơn
+                                    </button>
+                                }
+
+                                @if (item.value.TrangThaiThanhToan == "Chưa thanh toán")
+                                {
+                                    <button type="button" class="btn btn-danger pay-momo"
+                                            data-order-id="@item.value.MaHoaDon"
+                                            data-customer-id="@item.value.MaKhachHang"
+                                            data-amount="@item.value.TongTien"
+                                            data-bs-toggle="tooltip"
+                                            title="Thanh toán qua MoMo">
+                                        <i class="fas fa-wallet"></i> Thanh toán MoMo
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-lock"></i> Không thể thanh toán
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pagination" class="pagination-container">
+        <!-- Pagination will be inserted here by JavaScript -->
+    </div>
+
+    <!-- No results message -->
+    <div id="noResults" class="no-results d-none">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <p>Không tìm thấy hóa đơn nào phù hợp với tìm kiếm của bạn.</p>
+        <button id="clearSearch" class="btn btn-primary">Xóa tìm kiếm</button>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelOrderModalLabel">Xác nhận hủy đơn hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn hủy đơn hàng này không?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Lưu ý: Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Đóng
+                </button>
+                <form id="cancelOrderForm" asp-action="CancelOrder" asp-controller="HoaDons" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="cancelOrderId" name="id" value="" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-ban"></i> Xác nhận hủy
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MoMo Payment Modal -->
+<div class="modal fade" id="momoPaymentModal" tabindex="-1" aria-labelledby="momoPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="momoPaymentModalLabel">Thanh toán qua MoMo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn sẽ được chuyển đến cổng thanh toán MoMo để hoàn tất giao dịch.</p>
+                <div class="d-flex align-items-center justify-content-center my-3">
+                    <img src="/images/momo-logo.png" alt="MoMo Logo" class="momo-logo" />
+                </div>
+                <div class="payment-details">
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">Mã đơn hàng:</div>
+                        <div class="col-7" id="momoOrderId"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-bold">Số tiền:</div>
+                        <div class="col-7 fw-bold text-danger" id="momoAmount"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+                <form id="momoPaymentForm" method="post" asp-action="CreatePaymentUrl" asp-controller="Momo">
+                    <input type="hidden" id="momoOrderIdInput" name="OrderId" value="" />
+                    <input type="hidden" id="momoFullNameInput" name="FullName" value="" />
+                    <input type="hidden" id="momoAmountInput" name="Amount" value="" />
+                    <input type="hidden" id="momoOrderInfoInput" name="OrderInfo" value="" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-wallet"></i> Tiếp tục thanh toán
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetOrderStatusClass(string status)
+    {
+        return status switch
+        {
+            "Đã hủy" => "status-cancelled",
+            "Hoàn thành" => "status-completed",
+            "Đang xử lý" => "status-processing",
+            "Chờ xác nhận" => "status-pending",
+            _ => "status-default"
+        };
+    }
+
+    public string GetOrderStatusIcon(string status)
+    {
+        return status switch
+        {
+            "Đã hủy" => "<i class=\"fas fa-ban\"></i>",
+            "Hoàn thành" => "<i class=\"fas fa-check-circle\"></i>",
+            "Đang xử lý" => "<i class=\"fas fa-spinner fa-spin\"></i>",
+            "Chờ xác nhận" => "<i class=\"fas fa-clock\"></i>",
+            _ => "<i class=\"fas fa-question-circle\"></i>"
+        };
+    }
+}
+<style>
+    /* Invoice List Styling */
+    .invoice-container {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .invoice-header {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .invoice-title {
+        color: #333;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+        .invoice-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #ff5e62, #ff9966);
+            border-radius: 3px;
+        }
+
+    .invoice-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Search Box */
+    .search-container {
+        position: relative;
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid #ddd;
+        border-radius: 30px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff9966;
+            box-shadow: 0 0 0 3px rgba(255, 153, 102, 0.2);
+        }
+
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+
+    /* Filter Controls */
+    .filter-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        padding: 8px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #ff9966;
+            box-shadow: 0 0 0 3px rgba(255, 153, 102, 0.2);
+        }
+
+    /* Table Styling */
+    .invoice-table {
+        border-radius: 8px;
+        overflow: hidden;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #e0e0e0;
+    }
+
+        .invoice-table thead {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .invoice-table th {
+            padding: 15px 10px;
+            font-weight: 600;
+            text-align: center;
+            border: none;
+            position: relative;
+        }
+
+        .invoice-table tbody tr {
+            transition: all 0.2s;
+        }
+
+            .invoice-table tbody tr:hover {
+                background-color: rgba(255, 153, 102, 0.05);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+        .invoice-table td {
+            padding: 15px 10px;
+            vertical-align: middle;
+            border-top: 1px solid #e0e0e0;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+        }
+
+    /* Sortable Headers */
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .sortable i {
+            margin-left: 5px;
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+
+        .sortable:hover i {
+            opacity: 1;
+        }
+
+    .sort-asc i::before {
+        content: "\f0de"; /* fa-sort-up */
+        opacity: 1;
+        color: #ff9966;
+    }
+
+    .sort-desc i::before {
+        content: "\f0dd"; /* fa-sort-down */
+        opacity: 1;
+        color: #ff9966;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .status-badge i {
+            margin-right: 5px;
+        }
+
+    .status-cancelled {
+        background-color: #ffebee;
+        color: #d32f2f;
+        border: 1px solid #ffcdd2;
+    }
+
+    .status-completed {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .status-processing {
+        background-color: #fff8e1;
+        color: #ff8f00;
+        border: 1px solid #ffecb3;
+    }
+
+    .status-pending {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
+
+    .status-paid {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .status-unpaid {
+        background-color: #f5f5f5;
+        color: #616161;
+        border: 1px solid #e0e0e0;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        min-width: 150px;
+    }
+
+        .action-buttons .btn {
+            margin-bottom: 5px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .action-buttons .btn i {
+                margin-right: 5px;
+            }
+
+    .view-details {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+        transition: all 0.3s;
+    }
+
+        .view-details:hover {
+            background-color: #138496;
+            border-color: #117a8b;
+            transform: translateY(-2px);
+        }
+
+    /* Phone Link */
+    .phone-link {
+        color: #007bff;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .phone-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+    /* Total Amount */
+    .total-amount {
+        font-weight: 700;
+        color: #d32f2f;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+    }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+        .pagination li {
+            margin: 0;
+        }
+
+            .pagination li a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 16px;
+                text-decoration: none;
+                color: #333;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                transition: all 0.3s;
+            }
+
+            .pagination li.active a {
+                background-color: #ff9966;
+                color: white;
+                border-color: #ff9966;
+            }
+
+            .pagination li a:hover:not(.active) {
+                background-color: #f1f1f1;
+            }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+        .no-results i {
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .no-results p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+    /* Modal Customization */
+    .modal-content {
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .payment-details {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .momo-logo {
+        height: 60px;
+        width: auto;
+    }
+
+    /* Responsive Adjustments */
+    media (max-width: 992px) {
+        .invoice-actions
+
+    {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .filter-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    }
+
+    media (max-width: 768px) {
+        .invoice-table
+
+    {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .invoice-container {
+        padding: 15px;
+    }
+
+    .filter-container {
+        flex-direction: column;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    }
+
+    /* Animation for alerts */
+    .alert {
+        animation: fadeInDown 0.5s ease-out;
+    }
+
+    keyframes fadeInDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Animation for table rows */
+    keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    .invoice-row {
+        animation: fadeIn 0.3s ease-out;
+    }
+</style>
+<script>
+        // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Elements
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const paymentFilter = document.getElementById('paymentFilter');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        const invoiceTable = document.getElementById('invoiceTable');
+        const noResults = document.getElementById('noResults');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const paginationContainer = document.getElementById('pagination');
+
+        // Modal elements
+        const cancelOrderModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+        const momoPaymentModal = new bootstrap.Modal(document.getElementById('momoPaymentModal'));
+        const cancelOrderId = document.getElementById('cancelOrderId');
+        const momoOrderId = document.getElementById('momoOrderId');
+        const momoAmount = document.getElementById('momoAmount');
+        const momoOrderIdInput = document.getElementById('momoOrderIdInput');
+        const momoFullNameInput = document.getElementById('momoFullNameInput');
+        const momoAmountInput = document.getElementById('momoAmountInput');
+        const momoOrderInfoInput = document.getElementById('momoOrderInfoInput');
+
+        // Table rows
+        const allRows = Array.from(document.querySelectorAll('.invoice-row'));
+
+        // Pagination settings
+        const rowsPerPage = 10;
+        let currentPage = 1;
+        let filteredRows = [...allRows];
+
+        // Initialize
+        setupEventListeners();
+        initializeSorting();
+        updateTable();
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input
+            searchInput.addEventListener('input', function() {
+                currentPage = 1;
+                updateTable();
+            });
+
+            // Filters
+            statusFilter.addEventListener('change', function() {
+                currentPage = 1;
+                updateTable();
+            });
+
+            paymentFilter.addEventListener('change', function() {
+                currentPage = 1;
+                updateTable();
+            });
+
+            // Reset filters
+            resetFiltersBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                statusFilter.value = 'all';
+                paymentFilter.value = 'all';
+                currentPage = 1;
+                updateTable();
+            });
+
+            // Clear search
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                currentPage = 1;
+                updateTable();
+            });
+
+            // Cancel order buttons
+            document.querySelectorAll('.cancel-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    cancelOrderId.value = orderId;
+                    cancelOrderModal.show();
+                });
+            });
+
+            // MoMo payment buttons
+            document.querySelectorAll('.pay-momo').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    const customerId = this.getAttribute('data-customer-id');
+                    const amount = this.getAttribute('data-amount');
+
+                    // Set modal content
+                    momoOrderId.textContent = orderId;
+                    momoAmount.textContent = new Intl.NumberFormat('vi-VN').format(amount) + '₫';
+
+                    // Set form values
+                    momoOrderIdInput.value = generateUUID();
+                    momoFullNameInput.value = customerId;
+                    momoAmountInput.value = amount;
+                    momoOrderInfoInput.value = `Thanh toán đơn hàng #${orderId} qua MoMo tại Fast_Food`;
+
+                    momoPaymentModal.show();
+                });
+            });
+
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert:not(.d-none)');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('fade');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500);
+                }, 5000);
+            });
+        }
+
+        // Initialize sorting functionality
+        function initializeSorting() {
+            const sortableHeaders = document.querySelectorAll('.sortable');
+
+            sortableHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const sortBy = this.getAttribute('data-sort');
+
+                    // Remove sort classes from all headers
+                    sortableHeaders.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+
+                    // Determine sort direction
+                    let sortDirection = 'asc';
+                    if (this.classList.contains('sort-asc')) {
+                        sortDirection = 'desc';
+                        this.classList.add('sort-desc');
+                    } else {
+                        this.classList.add('sort-asc');
+                    }
+
+                    // Sort the rows
+                    sortRows(sortBy, sortDirection);
+
+                    // Reset pagination to first page
+                    currentPage = 1;
+                    updateTable();
+                });
+            });
+        }
+
+        // Sort table rows
+        function sortRows(sortBy, sortDirection) {
+            filteredRows.sort((a, b) => {
+                let valueA, valueB;
+
+                switch(sortBy) {
+                    case 'index':
+                        valueA = parseInt(a.querySelector('td:first-child').textContent);
+                        valueB = parseInt(b.querySelector('td:first-child').textContent);
+                        break;
+                    case 'orderTime':
+                        valueA = a.getAttribute('data-order-time');
+                        valueB = b.getAttribute('data-order-time');
+                        break;
+                    case 'status':
+                        valueA = a.getAttribute('data-order-status');
+                        valueB = b.getAttribute('data-order-status');
+                        break;
+                    case 'payment':
+                        valueA = a.getAttribute('data-payment-status');
+                        valueB = b.getAttribute('data-payment-status');
+                        break;
+                    case 'total':
+                        valueA = parseFloat(a.getAttribute('data-total'));
+                        valueB = parseFloat(b.getAttribute('data-total'));
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (valueA < valueB) {
+                    return sortDirection === 'asc' ? -1 : 1;
+                }
+                if (valueA > valueB) {
+                    return sortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+
+        // Filter table rows
+        function filterRows() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusValue = statusFilter.value;
+            const paymentValue = paymentFilter.value;
+
+            filteredRows = allRows.filter(row => {
+                const searchData = row.getAttribute('data-search').toLowerCase();
+                const orderStatus = row.getAttribute('data-order-status');
+                const paymentStatus = row.getAttribute('data-payment-status');
+
+                const matchesSearch = searchTerm === '' || searchData.includes(searchTerm);
+                const matchesStatus = statusValue === 'all' || orderStatus === statusValue;
+                const matchesPayment = paymentValue === 'all' || paymentStatus === paymentValue;
+
+                return matchesSearch && matchesStatus && matchesPayment;
+            });
+
+            return filteredRows.length > 0;
+        }
+
+        // Update table with filtered and paginated rows
+        function updateTable() {
+            // Apply filters
+            const hasResults = filterRows();
+
+            // Show/hide no results message
+            if (!hasResults) {
+                noResults.classList.remove('d-none');
+                paginationContainer.classList.add('d-none');
+            } else {
+                noResults.classList.add('d-none');
+
+                // Calculate pagination
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+
+                // Hide all rows first
+                allRows.forEach(row => {
+                    row.style.display = 'none';
+                });
+
+                // Show only the rows for current page
+                for (let i = startIndex; i < endIndex; i++) {
+                    filteredRows[i].style.display = '';
+                }
+
+                // Update pagination
+                renderPagination(totalPages);
+            }
+        }
+
+        // Render pagination controls
+        function renderPagination(totalPages) {
+            if (totalPages <= 1) {
+                paginationContainer.classList.add('d-none');
+                return;
+            }
+
+            paginationContainer.classList.remove('d-none');
+
+            let paginationHTML = '<ul class="pagination">';
+
+            // Previous button
+            paginationHTML += `
+                <li class="${currentPage === 1 ? 'disabled' : ''}">
+                    <a href="#" data-page="${currentPage - 1}" ${currentPage === 1 ? 'tabindex="-1"' : ''}>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+
+            // Page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                paginationHTML += `<li><a href="#" data-page="1">1</a></li>`;
+                if (startPage > 2) {
+                    paginationHTML += `<li class="disabled"><a href="#">...</a></li>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <li class="${i === currentPage ? 'active' : ''}">
+                        <a href="#" data-page="${i}">${i}</a>
+                    </li>
+                `;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<li class="disabled"><a href="#">...</a></li>`;
+                }
+                paginationHTML += `<li><a href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+            }
+
+            // Next button
+            paginationHTML += `
+                <li class="${currentPage === totalPages ? 'disabled' : ''}">
+                    <a href="#" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'tabindex="-1"' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+
+            paginationHTML += '</ul>';
+
+            paginationContainer.innerHTML = paginationHTML;
+
+            // Add event listeners to pagination links
+            document.querySelectorAll('.pagination a[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    if (this.parentElement.classList.contains('disabled')) {
+                        return;
+                    }
+
+                    const page = parseInt(this.getAttribute('data-page'));
+                    currentPage = page;
+                    updateTable();
+
+                    // Scroll to top of table
+                    invoiceTable.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        }
+
+        // Generate UUID for MoMo payment
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    });
+</script>
