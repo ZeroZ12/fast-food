@@ -1,0 +1,181 @@
+@{
+    ViewData["Title"] = "Đăng Nhập";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg mt-5 border-0 bg-glass">
+                <!-- Header -->
+                <div class="card-header text-center" style="background-color: #FF4500; color: white; border-radius: 15px 15px 0 0; padding: 1.5rem 0;">
+                    <h2 class="mb-0 fw-bold">Đăng Nhập</h2>
+                    <p class="mb-0">Chào mừng bạn quay trở lại Poly Food</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Hiển thị lỗi nếu có -->
+                    @if (!string.IsNullOrEmpty(ViewBag.loi as string))
+                    {
+                        <div class="alert alert-danger text-center d-flex align-items-center justify-content-center">
+                            <ion-icon name="alert-circle-outline" class="me-2" style="font-size: 1.2rem;"></ion-icon>
+                            <span>@ViewBag.loi</span>
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post" id="loginForm" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- Nhập tài khoản -->
+                        <div class="mb-4">
+                            <label for="tk" class="form-label fw-bold">Tên Tài Khoản</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white" style="border-right: none;">
+                                    <ion-icon name="person-circle-outline" class="icon-large"></ion-icon>
+                                </span>
+                                <input type="text" id="tk" name="tk" required class="form-control"
+                                       placeholder="Nhập tên tài khoản" style="border-left: none;" />
+                            </div>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên tài khoản
+                            </div>
+                        </div>
+
+                        <!-- Nhập mật khẩu -->
+                        <div class="mb-3">
+                            <label for="Password" class="form-label fw-bold">Mật Khẩu</label>
+                            <div class="input-group position-relative">
+                                <span class="input-group-text bg-white" style="border-right: none;">
+                                    <ion-icon name="lock-closed-outline" class="icon-large"></ion-icon>
+                                </span>
+                                <input type="password" id="Password" name="mk" required class="form-control"
+                                       placeholder="Nhập mật khẩu" style="border-left: none;" />
+                                <span class="password-toggle" onclick="togglePassword()">
+                                    <ion-icon name="eye-outline" id="passwordToggleIcon"></ion-icon>
+                                </span>
+                            </div>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập mật khẩu
+                            </div>
+                        </div>
+
+                        <!-- Remember me checkbox -->
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="rememberMe" name="rememberMe" class="form-check-input"
+                                   style="border-color: #FF4500; outline: none;">
+                            <label for="rememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
+                        </div>
+
+                        <!-- Nút đăng nhập -->
+                        <div class="d-grid mt-4">
+                            <button class="btn fw-bold text-white btn-lg" type="submit"
+                                    style="background-color: #FF4500; transition: all 0.3s;">
+                                <ion-icon name="log-in-outline" class="me-2"></ion-icon>Đăng Nhập
+                            </button>
+                        </div>
+
+                        <!-- Link đăng ký -->
+                        <div class="mt-4 text-center">
+                            <a href="@Url.Action("DangKy", "DangNhap")" class="text-decoration-none fw-bold" style="color: #FF4500;">
+                                <ion-icon name="person-add-outline" class="me-1"></ion-icon>Chưa có tài khoản? Đăng ký ngay
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    body {
+        background-image: url('/img/monan/z6368182400617_0f806ea61bdc71b6ac484c67339bc4e3.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-blend-mode: normal;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Điều chỉnh nền form */
+    .bg-glass {
+        background: rgba(255, 255, 255, 0.8); /* Tăng độ đục để dễ đọc hơn */
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        transition: all 0.3s ease;
+    }
+
+        .bg-glass:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+    .icon-large {
+        font-size: 1.5rem;
+        color: #FF4500;
+    }
+
+    .form-control:focus {
+        border-color: #FF4500;
+        box-shadow: 0 0 0 0.25rem rgba(255, 69, 0, 0.25);
+    }
+
+    .form-check-input:checked {
+        background-color: #FF4500;
+        border-color: #FF4500;
+    }
+
+    .password-toggle {
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        color: #6c757d;
+    }
+
+    .btn:hover {
+        background-color: #E03E00 !important;
+        transform: translateY(-2px);
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: none;
+        border-radius: 10px;
+    }
+</style>
+
+<!-- Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('loginForm');
+
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        });
+    });
+
+    function togglePassword() {
+        const passwordField = document.getElementById('Password');
+        const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            passwordToggleIcon.setAttribute('name', 'eye-off-outline');
+        } else {
+            passwordField.type = 'password';
+            passwordToggleIcon.setAttribute('name', 'eye-outline');
+        }
+    }
+</script>
