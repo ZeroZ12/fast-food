@@ -1,0 +1,1326 @@
+﻿/* General Body Styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding-top: 50px; /* Đảm bảo không gian cho navbar */
+}
+
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    left: -250px; /* Mặc định ẩn sidebar */
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: #343a40;
+    color: white;
+    padding: 20px;
+    padding-top: 80px; /* Đẩy nội dung xuống dưới, tránh đè lên nút menu */
+    transition: left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
+    z-index: 1000;
+}
+
+    .sidebar.active {
+        left: 0; /* Hiển thị sidebar khi active */
+    }
+
+/* Main Content Styling */
+.main-content {
+    margin-left: 0; /* Không gian mặc định khi sidebar ẩn */
+    transition: margin-left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
+    padding-top: 60px; /* Khoảng cách từ navbar */
+    z-index: 500;
+}
+
+/* Khi sidebar mở */
+.sidebar.active + .main-content {
+    margin-left: 250px; /* Nội dung chính dịch chuyển */
+}
+
+/* Menu Toggle Button */
+.menu-toggle {
+    position: fixed; /* Nút menu cố định trên màn hình */
+    top: 20px; /* Khoảng cách từ trên xuống */
+    left: 20px; /* Khoảng cách từ trái */
+    z-index: 1100; /* Hiển thị trên sidebar */
+    font-size: 1.8rem; /* Kích thước biểu tượng */
+    background: none; /* Loại bỏ màu nền */
+    border: none; /* Loại bỏ viền */
+    color: #343a40; /* Màu biểu tượng */
+    cursor: pointer; /* Thay đổi con trỏ thành dạng tay khi rê chuột */
+    transition: left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
+}
+
+    .menu-toggle ion-icon {
+        font-size: 1.8rem;
+    }
+
+/* Sidebar Nav Link Styling */
+.sidebar .nav-link {
+    color: #ffffff;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s ease; /* Hiệu ứng hover mượt */
+}
+
+    .sidebar .nav-link:hover {
+        background-color: #6c757d;
+        border-radius: 5px; /* Góc bo tròn */
+    }
+
+    /* Sidebar Icons */
+    .sidebar .nav-link ion-icon {
+        font-size: 1.5rem;
+        margin-right: 10px; /* Khoảng cách giữa icon và text */
+    }
+
+/* Logo Styling */
+/* Logo Styling */
+.navbar-brand .nav-logo {
+    height: 120px; /* Chiều cao lớn hơn cho logo */
+    max-height: 150px; /* Đảm bảo logo không quá lớn */
+    width: auto; /* Giữ tỷ lệ của logo */
+    object-fit: contain; /* Đảm bảo logo không bị méo */
+    display: block; /* Giúp logo luôn là một khối riêng */
+    margin: 0 auto; /* Căn giữa logo */
+    border-radius: 15px; /* Làm mềm các góc cạnh nếu logo hình vuông */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Thêm bóng mờ để logo nổi bật */
+    transition: transform 0.3s ease-in-out; /* Hiệu ứng mượt khi hover */
+}
+    /* Hiệu ứng khi hover vào logo */
+    .navbar-brand .nav-logo:hover {
+        transform: scale(1.1); /* Phóng to nhẹ logo */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Tăng bóng mờ khi hover */
+    }
+
+
+/* Collapsed Sidebar */
+.sidebar.collapsed {
+    width: 80px; /* Thu gọn sidebar */
+    left: 0; /* Giữ sidebar mở */
+}
+
+    .sidebar.collapsed .nav-link {
+        text-align: center; /* Canh giữa icon */
+    }
+
+        .sidebar.collapsed .nav-link span {
+            display: none; /* Ẩn văn bản khi thu gọn */
+        }
+
+        .sidebar.collapsed .nav-link ion-icon {
+            margin-right: 0; /* Loại bỏ khoảng cách icon */
+        }
+
+/* Navbar Styling */
+.navbar {
+    position: relative;
+    z-index: 900; /* Đảm bảo navbar luôn ở phía trên nội dung */
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-top: 1px solid #dee2e6;
+}
+/*icon giỏ hàng ở dưới cùng bên phải*/
+.cart-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #ff6600;
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.cart-icon:hover {
+    background: #e65c00;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+/*icon acc */
+/* Đảm bảo rằng phần tử ở góc phải */
+.account-icon-container {
+    position: fixed; /* Để cố định vị trí */
+    top: 10px; /* Cách từ trên cùng */
+    right: 10px; /* Cách từ bên phải */
+    z-index: 1000; /* Đảm bảo nó nằm trên các phần tử khác */
+}
+
+/* Kiểu cho phần tử account-icon */
+.account-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa icon và tên */
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer; /* Thêm con trỏ pointer khi hover */
+    transition: color 0.3s ease; /* Hiệu ứng màu mượt mà khi hover */
+}
+
+    .account-icon:hover {
+        color: #007bff; /* Màu khi hover */
+    }
+
+    .account-icon i {
+        font-size: 24px; /* Điều chỉnh kích thước icon */
+    }
+
+    .account-icon span {
+        font-size: 16px;
+    }
+
+/* Dropdown menu */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* Đặt menu ngay dưới phần tử icon */
+    right: 0; /* Căn phải để menu không vượt quá viền màn hình */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    z-index: 10000; /* Thêm z-index cao để dropdown không bị che */
+    opacity: 0; /* Ẩn dropdown mặc định */
+    visibility: hidden; /* Ẩn dropdown */
+    transition: opacity 0.3s ease, visibility 0s 0.3s; /* Thêm hiệu ứng mượt mà */
+}
+
+    /* Hiển thị dropdown khi hover vào account-dropdown */
+    .account-dropdown:hover .dropdown-menu,
+    .dropdown-menu:hover {
+        display: block;
+        opacity: 1; /* Đưa dropdown về trạng thái rõ ràng */
+        visibility: visible; /* Hiển thị dropdown khi hover */
+        transition: opacity 0.3s ease, visibility 0s 0s; /* Thêm hiệu ứng */
+    }
+
+    /* Kiểu cho các item trong dropdown */
+    .dropdown-menu a {
+        display: block;
+        padding: 10px;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .dropdown-menu a:hover {
+            background-color: #f1f1f1;
+        }
+/* Căn chỉnh menu icon */
+.search-bar {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+.search-input {
+    width: 1000px; /* Làm cho ô input chiếm toàn bộ form */
+}
+.product-card {
+    z-index: 1;
+}
+
+.cart-icon {
+    z-index: 10; /* Đặt số cao hơn để nó hiển thị trên */
+}
+.account-icon-container {
+    z-index: 1100; /* Đặt số cao hơn để nó hiển thị trên */
+}
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    padding: 3px 6px;
+    border-radius: 50%;
+    background-color: #ff4444;
+    color: white;
+    font-size: 0.7rem;
+}
+
+.notification-dropdown {
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+
+.notification-message {
+    margin-bottom: 5px;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+/* Search Container */
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Search Wrapper */
+.search-wrapper {
+    display: flex;
+    align-items: stretch;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+    .search-wrapper:focus-within {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+/* Search Input Container */
+.search-input-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+}
+
+/* Search Icon */
+.search-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 20px;
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+.search-input-container:focus-within .search-icon {
+    color: #198754;
+}
+
+/* Search Input */
+.search-input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    font-size: 16px;
+    color: #495057;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #198754;
+    }
+
+    .search-input::placeholder {
+        color: #adb5bd;
+        transition: opacity 0.3s ease;
+    }
+
+    .search-input:focus::placeholder {
+        opacity: 0.7;
+    }
+
+/* Clear Button */
+.clear-button {
+    position: absolute;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+    .clear-button:hover {
+        color: #dc3545;
+    }
+
+/* Search Button */
+.search-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 24px;
+    background-color: #198754;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 130px;
+}
+
+    .search-button:hover {
+        background-color: #146c43;
+    }
+
+    .search-button:active {
+        transform: scale(0.98);
+    }
+
+    .search-button ion-icon {
+        font-size: 18px;
+    }
+
+/* Search Suggestions */
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+    .search-suggestions.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background-color 0.2s ease;
+}
+
+    .suggestion-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .suggestion-item.selected {
+        background-color: #e9ecef;
+    }
+
+.suggestion-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.suggestion-content {
+    flex: 1;
+}
+
+.suggestion-title {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.suggestion-category {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.suggestion-price {
+    font-weight: 600;
+    color: #198754;
+}
+
+.no-suggestions {
+    padding: 16px;
+    text-align: center;
+    color: #6c757d;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+    .search-wrapper {
+        flex-direction: column;
+    }
+
+    .search-input {
+        border-right: 2px solid #e9ecef;
+        border-bottom: none;
+    }
+
+    .search-button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .search-button-text {
+        display: none;
+    }
+
+    .search-button ion-icon {
+        font-size: 20px;
+    }
+}
+/* User Navigation Container */
+.user-nav-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 1000;
+}
+.header-fixed .user-nav-container {
+    position: fixed;
+}
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+}
+
+.account-toggle {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+    .account-toggle:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .account-toggle:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.25);
+    }
+
+/* Avatar Styling */
+.avatar-wrapper {
+    position: relative;
+    margin-right: 10px;
+}
+
+.account-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.account-toggle:hover .account-avatar {
+    transform: scale(1.05);
+}
+
+.avatar-status-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #10b981;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-greeting {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #212529;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-arrow {
+    font-size: 12px;
+    color: #6c757d;
+    transition: transform 0.3s ease;
+}
+
+.account-toggle[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.account-menu {
+    width: 250px;
+    padding: 8px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+    animation: fadeInDown 0.3s ease;
+}
+
+.dropdown-header {
+    padding: 12px 16px;
+}
+
+.menu-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-name-header {
+    font-weight: 600;
+    color: #212529;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-item:active {
+        background-color: #e9ecef;
+    }
+
+.menu-icon {
+    width: 20px;
+    margin-right: 12px;
+    color: #6c757d;
+}
+
+.logout-item {
+    color: #dc3545;
+}
+
+    .logout-item .menu-icon {
+        color: #dc3545;
+    }
+
+    .logout-item:hover {
+        background-color: #ffebee;
+    }
+
+/* Shopping Cart */
+.cart-container {
+    position: relative;
+}
+
+.cart-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    text-decoration: none;
+    color: #212529;
+    transition: all 0.3s ease;
+}
+
+    .cart-button:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: #198754;
+    }
+
+.cart-icon-wrapper {
+    position: relative;
+    font-size: 20px;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #dc3545;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    animation: pulse 2s infinite;
+}
+
+.cart-text {
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive Adjustments */
+@media (min-width: 1200px) {
+    .container .user-nav-container {
+        right: calc((100% - 1140px) / 2 + 20px);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-nav-container {
+        top: 10px;
+        right: 15px;
+    }
+
+    /* Compact the elements on mobile */
+    .user-nav-container {
+        gap: 10px;
+    }
+
+    /* Hide text labels on mobile */
+    .cart-text,
+    .user-info {
+        display: none !important;
+    }
+}
+/* Employee Navigation Container - Top Right Positioning */
+.employee-nav-container {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* For fixed header layouts */
+.header-fixed .employee-nav-container {
+    position: fixed;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+}
+
+.account-toggle {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+    .account-toggle:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .account-toggle:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.25);
+    }
+
+/* Avatar Styling */
+.avatar-wrapper {
+    position: relative;
+    margin-right: 10px;
+}
+
+.account-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.account-toggle:hover .account-avatar {
+    transform: scale(1.05);
+}
+
+.avatar-status-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #10b981;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-greeting {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #212529;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-arrow {
+    font-size: 12px;
+    color: #6c757d;
+    transition: transform 0.3s ease;
+}
+
+.account-toggle[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.account-menu {
+    width: 250px;
+    padding: 8px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+    animation: fadeInDown 0.3s ease;
+}
+
+.dropdown-header {
+    padding: 12px 16px;
+}
+
+.menu-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-name-header {
+    font-weight: 600;
+    color: #212529;
+}
+
+.user-role {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-item:active {
+        background-color: #e9ecef;
+    }
+
+.menu-icon {
+    width: 20px;
+    margin-right: 12px;
+    color: #6c757d;
+}
+
+.logout-item {
+    color: #dc3545;
+}
+
+    .logout-item .menu-icon {
+        color: #dc3545;
+    }
+
+    .logout-item:hover {
+        background-color: #ffebee;
+    }
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .employee-nav-container {
+        top: 10px;
+        right: 15px;
+    }
+
+    .account-toggle {
+        padding: 6px;
+    }
+
+    .user-info {
+        display: none !important;
+    }
+}
+
+/* If your site has a container with max-width */
+@media (min-width: 1200px) {
+    .container .employee-nav-container {
+        right: calc((100% - 1140px) / 2 + 20px);
+    }
+}
+/* Auth Navigation Container - Top Right Positioning */
+.auth-nav-container {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* For fixed header layouts */
+.header-fixed .auth-nav-container {
+    position: fixed;
+}
+
+/* Auth Links Wrapper */
+.auth-links-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 30px;
+    padding: 6px 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+    .auth-links-wrapper:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+/* Auth Links */
+.auth-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #495057;
+    font-weight: 500;
+    padding: 6px 8px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+    .auth-link:hover {
+        color: #198754;
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+
+.auth-icon {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+/* Login Link Specific */
+.login-link {
+    color: #198754;
+}
+
+    .login-link:hover {
+        color: #0d6e3f;
+    }
+
+/* Register Link Specific */
+.register-link {
+    color: #6c757d;
+}
+
+    .register-link:hover {
+        color: #495057;
+    }
+
+/* Auth Divider */
+.auth-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #dee2e6;
+    margin: 0 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .auth-nav-container {
+        top: 10px;
+        right: 15px;
+    }
+
+    .auth-links-wrapper {
+        padding: 4px 12px;
+    }
+
+    .auth-link {
+        padding: 4px 6px;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-text {
+        display: none;
+    }
+
+    .auth-icon {
+        margin-right: 0;
+        font-size: 16px;
+    }
+
+    .auth-links-wrapper {
+        padding: 6px 10px;
+    }
+
+    .auth-link {
+        padding: 4px;
+    }
+}
+
+/* If your site has a container with max-width */
+@media (min-width: 1200px) {
+    .container .auth-nav-container {
+        right: calc((100% - 1140px) / 2 + 20px);
+    }
+}
+
+/* Animation for hover effect */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.auth-link:active {
+    animation: pulse 0.3s ease;
+}
+/* Footer Styles */
+.footer {
+    background-color: #2c2c2c;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    padding: 60px 0 20px;
+    position: relative;
+}
+
+    .footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 10px;
+        background: linear-gradient(90deg, #ff7700, #e63946, #ff9500);
+    }
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 200px;
+}
+
+    .footer-section h3 {
+        color: #ff9500;
+        font-size: 20px;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: #ff7700;
+        }
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        color: #e0e0e0;
+        text-decoration: none;
+        transition: color 0.3s;
+        display: block;
+    }
+
+        .footer-links a:hover {
+            color: #ff9500;
+            padding-left: 5px;
+        }
+
+.contact-info {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+    .contact-info i {
+        color: #ff9500;
+        font-size: 18px;
+        min-width: 20px;
+    }
+
+.newsletter-form {
+    display: flex;
+    margin-top: 15px;
+}
+
+    .newsletter-form input {
+        flex: 1;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        font-size: 14px;
+    }
+
+    .newsletter-form button {
+        background-color: #ff7700;
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .newsletter-form button:hover {
+            background-color: #e63946;
+        }
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+    .social-icons a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: #3a3a3a;
+        border-radius: 50%;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+        .social-icons a:hover {
+            background-color: #ff9500;
+            transform: translateY(-3px);
+        }
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #3a3a3a;
+}
+
+    .footer-bottom p {
+        font-size: 14px;
+        color: #b0b0b0;
+    }
+
+.food-icon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+    }
+
+    .footer-section {
+        margin-bottom: 30px;
+    }
+}
+
+/* Special food decoration */
+.food-decoration {
+    position: absolute;
+    width: 100%;
+    top: -15px;
+    left: 0;
+    text-align: center;
+}
+
+    .food-decoration span {
+        display: inline-block;
+        margin: 0 15px;
+        font-size: 24px;
+        transform: translateY(-50%);
+    }
+
+/* Animation for newsletter success message */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.success-message {
+    display: none;
+    color: #4CAF50;
+    margin-top: 10px;
+    animation: fadeIn 0.5s;
+}
