@@ -1,0 +1,416 @@
+﻿@model IEnumerable<Fast_Food.Models.GioHang>
+
+@{
+    ViewData["Title"] = "Giỏ Hàng";
+    bool hasItems = Model != null && Model.Any();
+}
+
+<style>
+    .cart-container {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .cart-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+
+    .cart-count {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .cart-item {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .cart-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .cart-item-image {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .cart-item-details {
+        padding: 15px;
+    }
+
+    .cart-item-name {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 48px;
+    }
+
+    .cart-item-price {
+        font-weight: 700;
+        color: #28a745;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .cart-item-total {
+        font-weight: 700;
+        color: #007bff;
+        font-size: 16px;
+    }
+
+    .cart-item-note {
+        font-size: 14px;
+        color: #6c757d;
+        margin-top: 10px;
+        font-style: italic;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px 0;
+    }
+
+    .quantity-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .quantity-btn:hover {
+            background-color: #e9ecef;
+        }
+
+    .quantity-input {
+        width: 50px;
+        height: 32px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin: 0 8px;
+    }
+
+    .cart-item-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+
+    .remove-btn {
+        background-color: #fff;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+        .remove-btn:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .update-btn {
+        background-color: #fff;
+        color: #28a745;
+        border: 1px solid #28a745;
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+        .update-btn:hover {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+    .cart-summary {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .cart-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .cart-total-label {
+        font-size: 18px;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .cart-total-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #dc3545;
+    }
+
+    .cart-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .buy-btn {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .buy-btn:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+    .order-btn {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+    }
+
+        .order-btn:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+
+    .empty-cart {
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .empty-cart-icon {
+        font-size: 80px;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .empty-cart-message {
+        font-size: 20px;
+        color: #6c757d;
+        margin-bottom: 30px;
+    }
+
+    .continue-shopping {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-block;
+    }
+
+        .continue-shopping:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+    /* Responsive styles */
+    media (max-width: 768px) {
+        .cart-container
+
+    {
+        padding: 15px;
+    }
+
+    .cart-item-image {
+        height: 120px;
+    }
+
+    .cart-actions {
+        flex-direction: column;
+    }
+
+    .action-btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    }
+</style>
+
+<div class="container py-5">
+    @if (TempData["Error2"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error2"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="cart-container">
+        <div class="cart-header">
+            <h1 class="cart-title">
+                <i class="bi bi-cart3 me-2"></i> Giỏ Hàng
+            </h1>
+            <span class="cart-count">
+                @(hasItems ? Model.Count() : 0) sản phẩm
+            </span>
+        </div>
+
+        @if (hasItems)
+        {
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="cart-item">
+                            <img src="@item.MaMonNavigation.HinhAnh" alt="@item.MaMonNavigation.TenMon" class="cart-item-image" />
+
+                            <div class="cart-item-details">
+                                <a href="@Url.Action("Details", "MonAns", new { id = item.MaMon })" class="text-decoration-none">
+                                    <h5 class="cart-item-name">@item.MaMonNavigation.TenMon</h5>
+                                </a>
+
+                                <div class="d-flex justify-content-between">
+                                    <div class="cart-item-price">
+                                        @String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:N0} đ", item.MaMonNavigation.Gia)
+                                    </div>
+                                    <div class="cart-item-total">
+                                        @String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:N0} đ", item.Gia)
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(item.GhiChu))
+                                {
+                                    <div class="cart-item-note">
+                                        <i class="bi bi-pencil-square me-1"></i> @item.GhiChu
+                                    </div>
+                                }
+
+                                <form method="post" asp-action="CapNhatSoLuong" class="mt-3">
+                                    <input type="hidden" name="id" value="@item.MaGioHang" />
+
+                                    <div class="quantity-control">
+                                        <button type="button" class="quantity-btn decrease-btn" onclick="decreaseQuantity(this)">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" name="soLuong" value="@item.SoLuong" min="1" class="quantity-input" readonly />
+                                        <button type="button" class="quantity-btn increase-btn" onclick="increaseQuantity(this)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="cart-item-actions">
+                                        <button type="button" class="remove-btn" onclick="removeItem('@item.MaGioHang')">
+                                            <i class="bi bi-trash me-1"></i> Xóa
+                                        </button>
+                                        <button type="submit" class="update-btn">
+                                            <i class="bi bi-arrow-repeat me-1"></i> Cập nhật
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <div class="cart-total-label">Tổng tiền:</div>
+                    <div class="cart-total-value">
+                        @((ViewData["TotalPrice"] != null) ? ((decimal)ViewData["TotalPrice"]).ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫" : "0 ₫")
+                    </div>
+                </div>
+
+                <div class="cart-actions">
+                    <form method="post" asp-action="MuaSanPham">
+                        <button type="submit" class="btn buy-btn action-btn">
+                            <i class="bi bi-bag-check me-2"></i> Mua ngay
+                        </button>
+                    </form>
+                    <a class="btn order-btn action-btn" href="@Url.Action("EditKhachHang", "GioHangs")">
+                        <i class="bi bi-box-seam me-2"></i> Đặt hàng
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-cart">
+                <div class="empty-cart-icon">
+                    <i class="bi bi-cart-x"></i>
+                </div>
+                <h3 class="empty-cart-message">Giỏ hàng của bạn đang trống</h3>
+                <a href="@Url.Action("Index", "MonAns")" class="continue-shopping">
+                    <i class="bi bi-arrow-left me-2"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Add Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<!-- Form for item removal -->
+<form id="removeForm" action="/GioHangs/Delete" method="post" style="display: none;">
+    <input type="hidden" name="id" id="removeItemId" />
+</form>
+
+<script>
+    //

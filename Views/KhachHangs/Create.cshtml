@@ -1,0 +1,84 @@
+﻿@model Fast_Food.Models.KhachHang
+
+@{
+    ViewData["Title"] = "Create Customer";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white text-center py-3">
+            <h3 class="m-0">Thêm Khách Hàng</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" class="row g-3">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="TenKhachHang" class="form-control" placeholder="Tên khách hàng" />
+                        <label>Tên Khách Hàng</label>
+                    </div>
+                    <span asp-validation-for="TenKhachHang" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="GioiTinh" class="form-select">
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                        <label> Giới Tính</label>
+                    </div>
+                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="SoDienThoai" class="form-control" placeholder="Số điện thoại" />
+                        <label>Số Điện Thoại</label>
+                    </div>
+                    <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="NgaySinh" type="date" class="form-control" />
+                        <label>Ngày Sinh</label>
+                    </div>
+                    <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Email" />
+                        <label asp-for="Email"></label>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="DiaChi" class="form-control" placeholder="Địa chỉ" />
+                        <label> Địa Chỉ</label>
+                    </div>
+                    <span asp-validation-for="DiaChi" class="text-danger"></span>
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-user-plus"></i> Tạo Mới
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary px-4 ms-2">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

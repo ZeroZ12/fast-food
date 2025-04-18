@@ -1,0 +1,42 @@
+﻿@model List<Fast_Food.Models.KhachHang>
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-danger text-white text-center">
+            <h2><i class="fas fa-users"></i> Danh sách Khách hàng</h2>
+        </div>
+        <div class="card-body">
+            <div class="mb-3 text-end">
+                <a href="@Url.Action("Create", "KhachHangs")" class="btn btn-success"><i class="fas fa-user-plus"></i> Đăng ký</a>
+            </div>
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Tên khách hàng</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var kh in Model)
+                    {
+                        <tr>
+                            <td>@kh.TenKhachHang</td>
+                            <td>@kh.Email</td>
+                            <td>@kh.SoDienThoai</td>
+                            <td>
+                                <a href="@Url.Action("Details", "KhachHangs", new { id = kh.MaKhachHang })" class="btn btn-primary btn-sm">
+                                    📜Xem Chi Tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- FontAwesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

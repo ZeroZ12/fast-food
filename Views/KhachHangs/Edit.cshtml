@@ -1,0 +1,531 @@
+﻿@model Fast_Food.Models.KhachHang
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Thông Tin Khách Hàng";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center text-primary mb-4">Thông Tin Khách Hàng</h1>
+    <hr class="border-primary" />
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Alert for displaying messages -->
+            <div id="alertMessage" class="alert d-none">
+                <span id="alertText"></span>
+                <button type="button" class="close" onclick="closeAlert()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="customerForm" asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Mã Khách Hàng -->
+                <input type="hidden" asp-for="MaKhachHang" />
+
+                <!-- Tên Khách Hàng -->
+                <div class="form-group mb-4">
+                    <label asp-for="TenKhachHang" class="control-label text-info">Tên Khách Hàng</label>
+                    <input asp-for="TenKhachHang" class="form-control form-control-lg border-info"
+                           placeholder="Nhập tên khách hàng..."
+                           aria-required="true" />
+                    <span asp-validation-for="TenKhachHang" class="text-danger error-message"></span>
+                </div>
+
+                <!-- Giới Tính -->
+                <div class="form-group mb-4">
+                    <label asp-for="GioiTinh" class="control-label text-info">Giới Tính</label>
+                    <select asp-for="GioiTinh" class="form-control form-control-lg border-info">
+                        <option value="true">Nam</option>
+                        <option value="false">Nữ</option>
+                    </select>
+                    <span asp-validation-for="GioiTinh" class="text-danger error-message"></span>
+                </div>
+
+                <!-- Số Điện Thoại -->
+                <div class="form-group mb-4">
+                    <label asp-for="SoDienThoai" class="control-label text-info">Số Điện Thoại</label>
+                    <input asp-for="SoDienThoai" class="form-control form-control-lg border-info"
+                           placeholder="Nhập số điện thoại..."
+                           aria-required="true" />
+                    <span asp-validation-for="SoDienThoai" class="text-danger error-message"></span>
+                </div>
+
+                <!-- Ngày Sinh -->
+                <div class="form-group mb-4">
+                    <label asp-for="NgaySinh" class="control-label text-info">Ngày Sinh</label>
+                    <input asp-for="NgaySinh" class="form-control form-control-lg border-info"
+                           type="date"
+                           aria-required="true" />
+                    <span asp-validation-for="NgaySinh" class="text-danger error-message"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group mb-4">
+                    <label asp-for="Email" class="control-label text-info">Email</label>
+                    <input asp-for="Email" class="form-control form-control-lg border-info"
+                           placeholder="Nhập email..."
+                           aria-required="true" />
+                    <span asp-validation-for="Email" class="text-danger error-message"></span>
+                </div>
+
+                <!-- Địa Chỉ -->
+                <div class="form-group mb-4">
+                    <label asp-for="DiaChi" class="control-label text-info">Địa Chỉ</label>
+                    <input asp-for="DiaChi" class="form-control form-control-lg border-info"
+                           placeholder="Nhập địa chỉ..."
+                           aria-required="true" />
+                    <span asp-validation-for="DiaChi" class="text-danger error-message"></span>
+                </div>
+
+                <!-- Avatar -->
+                <div class="form-group mb-4 text-center">
+                    <label class="control-label text-info d-block">Ảnh Đại Diện</label>
+
+                    <div class="avatar-container mb-3">
+                        @if (!string.IsNullOrEmpty(Model.Avatar))
+                        {
+                            <img src="@Model.Avatar" id="avatarPreview" class="avatar-preview mb-3" alt="Avatar" />
+                        }
+                        else
+                        {
+                            <img src="/images/default-avatar.png" id="avatarPreview" class="avatar-preview mb-3" alt="Default Avatar" />
+                        }
+                    </div>
+
+                    <div class="custom-file-container">
+                        <input type="file" id="avatarFile" name="AvatarFile" class="custom-file-input" accept="image/*" />
+                        <label for="avatarFile" class="custom-file-label">
+                            <span class="file-icon"><i class="fas fa-upload"></i></span>
+                            <span class="file-text">Chọn ảnh...</span>
+                        </label>
+                    </div>
+                    <small class="form-text text-muted mt-2">Chỉ chấp nhận file ảnh (JPG, PNG, GIF) dưới 2MB</small>
+                </div>
+
+                <!-- Nút Lưu và Hủy -->
+                <div class="form-group mt-5 d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success btn-lg px-4">
+                        <i class="fas fa-save mr-2"></i> Lưu Thay Đổi
+                    </button>
+                    <a href="javascript:void(0)" onclick="confirmCancel()" class="btn btn-secondary btn-lg px-4">
+                        <i class="fas fa-times mr-2"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    /* Main Styles */
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #17a2b8;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+    }
+
+        .avatar-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+    .avatar-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Custom File Input */
+    .custom-file-container {
+        position: relative;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .custom-file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .custom-file-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border: 2px dashed #17a2b8;
+        border-radius: 8px;
+        color: #495057;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .custom-file-label:hover {
+            background-color: #e9ecef;
+            border-color: #138496;
+        }
+
+    .file-icon {
+        margin-right: 10px;
+        color: #17a2b8;
+    }
+
+    /* Form Controls */
+    .form-control {
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            transform: translateY(-2px) scale(1.01);
+        }
+
+    .form-group label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .form-group:hover label {
+        color: #138496;
+    }
+
+    .text-info {
+        font-weight: 600;
+        color: #17a2b8;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+    /* Alert Messages */
+    .alert {
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    /* Error Messages */
+    .error-message {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    /* Animations */
+    keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Responsive Adjustments */
+    media (max-width: 768px) {
+        .form-control-lg
+
+    {
+        font-size: 1rem;
+        padding: 0.375rem 0.75rem;
+        height: calc(1.5em + 0.75rem + 2px);
+    }
+
+    .btn-lg {
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+    }
+
+    .avatar-preview {
+        width: 100px;
+        height: 100px;
+    }
+
+    }
+
+    media (max-width: 576px) {
+        .form-group.mt-5
+
+    {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-group.mt-5 .btn {
+        width: 100%;
+    }
+
+    }
+</style>
+<script>
+    // Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('customerForm');
+    const inputs = form.querySelectorAll('input, select');
+    
+    // Avatar preview functionality
+    const avatarInput = document.getElementById('avatarFile');
+    const avatarPreview = document.getElementById('avatarPreview');
+    
+    // Initialize form validation
+    initFormValidation();
+    
+    // Initialize avatar preview
+    initAvatarPreview();
+    
+    // Form submission handler
+    form.addEventListener('submit', function(event) {
+        if (!validateForm()) {
+            event.preventDefault();
+            showAlert('Vui lòng điền đầy đủ thông tin!', 'danger');
+            return false;
+        }
+        
+        if (!confirmSubmission()) {
+            event.preventDefault();
+            return false;
+        }
+        
+        return true;
+    });
+    
+    // Initialize form validation
+    function initFormValidation() {
+        inputs.forEach(input => {
+            if (input.hasAttribute('aria-required')) {
+                input.addEventListener('blur', function() {
+                    validateInput(this);
+                });
+                
+                input.addEventListener('input', function() {
+                    clearError(this);
+                });
+            }
+        });
+    }
+    
+    // Initialize avatar preview
+    function initAvatarPreview() {
+        avatarInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                // Validate file type
+                const fileType = this.files[0].type;
+                if (!fileType.match('image.*')) {
+                    showAlert('Vui lòng chọn file ảnh!', 'danger');
+                    return;
+                }
+                
+                // Validate file size (2MB max)
+                if (this.files[0].size > 2 * 1024 * 1024) {
+                    showAlert('Kích thước file không được vượt quá 2MB!', 'danger');
+                    return;
+                }
+                
+                // Update file label
+                const fileLabel = this.nextElementSibling.querySelector('.file-text');
+                fileLabel.textContent = this.files[0].name;
+                
+                // Preview image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.src = e.target.result;
+                    avatarPreview.classList.add('preview-animation');
+                    setTimeout(() => {
+                        avatarPreview.classList.remove('preview-animation');
+                    }, 1000);
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+    
+    // Validate a single input
+    function validateInput(input) {
+        const name = input.getAttribute('name');
+        const value = input.value.trim();
+        let errorMessage = '';
+        
+        // Clear previous error
+        clearError(input);
+        
+        // Required field validation
+        if (input.hasAttribute('aria-required') && value === '') {
+            errorMessage = 'Trường này không được để trống';
+        } else {
+            // Specific validations based on field name
+            switch (name) {
+                case 'TenKhachHang':
+                    if (value.length < 2) {
+                        errorMessage = 'Tên phải có ít nhất 2 ký tự';
+                    }
+                    break;
+                    
+                case 'SoDienThoai':
+                    if (!validatePhoneNumber(value)) {
+                        errorMessage = 'Số điện thoại không hợp lệ';
+                    }
+                    break;
+                    
+                case 'Email':
+                    if (!validateEmail(value)) {
+                        errorMessage = 'Email không hợp lệ';
+                    }
+                    break;
+                    
+                case 'DiaChi':
+                    if (value.length < 5) {
+                        errorMessage = 'Địa chỉ phải có ít nhất 5 ký tự';
+                    }
+                    break;
+            }
+        }
+        
+        // Display error if any
+        if (errorMessage) {
+            const errorSpan = input.parentElement.querySelector('.error-message');
+            errorSpan.textContent = errorMessage;
+            input.classList.add('is-invalid');
+            return false;
+        }
+        
+        input.classList.add('is-valid');
+        return true;
+    }
+    
+    // Clear error for an input
+    function clearError(input) {
+        const errorSpan = input.parentElement.querySelector('.error-message');
+        if (errorSpan) {
+            errorSpan.textContent = '';
+        }
+        input.classList.remove('is-invalid');
+    }
+    
+    // Validate the entire form
+    function validateForm() {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (input.hasAttribute('aria-required')) {
+                if (!validateInput(input)) {
+                    isValid = false;
+                }
+            }
+        });
+        
+        return isValid;
+    }
+    
+    // Validate phone number (Vietnamese format)
+    function validatePhoneNumber(phone) {
+        const regex = /^(0|\+84)(\d{9,10})$/;
+        return regex.test(phone);
+    }
+    
+    // Show alert message
+    function showAlert(message, type) {
+        const alertBox = document.getElementById('alertMessage');
+        const alertText = document.getElementById('alertText');
+        
+        alertBox.className = `alert alert-${type} alert-dismissible fade show`;
+        alertText.textContent = message;
+        alertBox.classList.remove('d-none');
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            closeAlert();
+        }, 5000);
+    }
+});
+
+// Close alert message
+function closeAlert() {
+    const alertBox = document.getElementById('alertMessage');
+    alertBox.classList.add('d-none');
+}
+
+// Confirm form submission
+function confirmSubmission() {
+    return confirm('Bạn có chắc chắn muốn lưu thay đổi thông tin khách hàng này?');
+}
+
+// Confirm cancel action
+function confirmCancel() {
+    if (confirm('Bạn có chắc chắn muốn hủy thay đổi? Mọi thay đổi sẽ không được lưu.')) {
+        window.location.href = '/Home'; // Adjust this URL to your customer list page
+    }
+}
+</script>
