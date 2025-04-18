@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Fast_Food</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Fast_Food.styles.css" asp-append-version="true" />
+
+    <!-- Ionicons Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <!-- Font Awesome Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signalr/5.0.12/signalr.min.js"></script>
+</head>
+<body>
+    <header>
+        @{
+            string actionName = ViewContext.RouteData.Values["action"]?.ToString();
+            string controllerName = ViewContext.RouteData.Values["controller"]?.ToString();
+            var id = Context.Request.RouteValues["id"];
+        }
+
+        @if (!(
+        (controllerName == "DangNhap" && (actionName == "Login" || actionName == "Register" || actionName == "LienHe")) ||
+        (controllerName == "KhachHangs" && actionName == "Edit") ||
+        (controllerName == "MonAns" && actionName == "QuanLySanPham") ||
+        (controllerName == "HoaDons" && actionName == "ThemHoaDonMoi") ||
+        (controllerName == "HoaDons" && actionName == "HoaDon") ||
+		(controllerName == "ThongKe" ) ||
+        (controllerName == "HoaDons" && actionName == "Index") 
+        ))
+        // Thêm điều kiện hiển thị thanh tìm kiếm
+        {
+            <div class="search-container">
+                <form asp-action="Index" asp-controller="MonAns" method="get" id="searchForm">
+                    <div class="search-wrapper">
+                        <div class="search-input-container">
+                            <ion-icon name="search-outline" class="search-icon"></ion-icon>
+                            <input class="search-input"
+                                   type="search"
+                                   name="TimKiem"
+                                   id="searchInput"
+                                   placeholder="Tìm kiếm món ăn..."
+                                   aria-label="Search"
+                                   autocomplete="off">
+                            <button type="button" class="clear-button" id="clearSearch" style="display: none;">
+                                <ion-icon name="close-circle"></ion-icon>
+                            </button>
+                        </div>
+                        <button class="search-button" type="submit">
+                            <span class="search-button-text">Tìm Kiếm</span>
+                            <ion-icon name="search"></ion-icon>
+                        </button>
+                    </div>
+
+                    <div class="search-suggestions" id="searchSuggestions"></div>
+                </form>
+            </div>
+        }
+        @{
+            var maKhachHang = Context.Session.GetString("MaKhachHang");
+            var tenKhachHang = Context.Session.GetString("TenKhachHang");
+            var tenNhanVien = Context.Session.GetString("TenNhanVien");
+            var maNhanVien = Context.Session.GetString("MaNhanVien");
+            var avatar = Context.Session.GetString("Avatar") ?? "/img/avatars/default-avatar.jpg";
+        }
+        @if (Context.Session.GetString("MaKhachHang") != null)
+        {
+            <!-- User Account and Cart Container -->
+            <div class="user-nav-container">
+                <!-- User Account Dropdown -->
+                <div class="account-dropdown dropdown">
+                    <button class="account-toggle dropdown-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-wrapper">
+                                <img src="@avatar" alt="Avatar" class="account-avatar" />
+                                <span class="avatar-status-indicator"></span>
+                            </div>
+                            <div class="user-info d-none d-md-block">
+                                <span class="user-greeting">Xin chào,</span>
+                                <span class="user-name">@tenKhachHang</span>
+                            </div>
+                            <i class="fas fa-chevron-down ms-2 dropdown-arrow"></i>
+                        </div>
+                    </button>
+
+                    <ul class="dropdown-menu account-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                        <li class="dropdown-header">
+                            <div class="d-flex align-items-center">
+                                <img src="@avatar" alt="Avatar" class="menu-avatar" />
+                                <div class="ms-2">
+                                    <div class="user-name-header">@tenKhachHang</div>
+                                    <div class="user-email">userEmail</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Edit", "KhachHangs", new { id = maKhachHang })">
+                                <i class="fas fa-user-circle menu-icon"></i>
+                                <span>Thông tin cá nhân</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Index", "HoaDons", new { id = maKhachHang })">
+                                <i class="fas fa-receipt menu-icon"></i>
+                                <span>Đơn mua</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item logout-item" href="@Url.Action("Logout", "DangNhap")">
+                                <i class="fas fa-sign-out-alt menu-icon"></i>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="cart-container">
+                    <a href="@Url.Action("Index", "GioHangs")" class="cart-button">
+                        <div class="cart-icon-wrapper">
+                            <i class="fas fa-shopping-cart"></i>
+                            @if (ViewBag.SoLuongGioHang > 0)
+                            {
+                                <span class="cart-badge">@ViewBag.SoLuongGioHang</span>
+                            }
+                        </div>
+                        <span class="cart-text d-none d-md-inline-block">Giỏ hàng</span>
+                    </a>
+                </div>
+            </div>
+        }
+        else if (Context.Session.GetString("MaNhanVien") != null)
+        {
+            <!-- Employee Account Dropdown (Top Right) -->
+            <div class="employee-nav-container">
+                <div class="account-dropdown dropdown">
+                    <button class="account-toggle dropdown-toggle" type="button" id="employeeMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-wrapper">
+                                <img src="@avatar" alt="Avatar" class="account-avatar" />
+                                <span class="avatar-status-indicator"></span>
+                            </div>
+                            <div class="user-info d-none d-md-block">
+                                <span class="user-greeting">Xin chào,</span>
+                                <span class="user-name">@Context.Session.GetString("TenNhanVien")</span>
+                            </div>
+                            <i class="fas fa-chevron-down ms-2 dropdown-arrow"></i>
+                        </div>
+                    </button>
+
+                    <ul class="dropdown-menu account-menu dropdown-menu-end" aria-labelledby="employeeMenuDropdown">
+                        <li class="dropdown-header">
+                            <div class="d-flex align-items-center">
+                                <img src="@avatar" alt="Avatar" class="menu-avatar" />
+                                <div class="ms-2">
+                                    <div class="user-name-header">@Context.Session.GetString("TenNhanVien")</div>
+                                    <div class="user-role">Nhân viên</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Edit", "NhanViens", new { id = maNhanVien })">
+                                <i class="fas fa-user-circle menu-icon"></i>
+                                <span>Thông tin cá nhân</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item logout-item" href="@Url.Action("Logout", "DangNhap")">
+                                <i class="fas fa-sign-out-alt menu-icon"></i>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Login/Register Component (Top Right) -->
+            <div class="auth-nav-container">
+                <div class="auth-links-wrapper">
+                    <a href="@Url.Action("Login", "DangNhap")" class="auth-link login-link">
+                        <i class="fas fa-sign-in-alt auth-icon"></i>
+                        <span class="auth-text">Đăng nhập</span>
+                    </a>
+                    <div class="auth-divider"></div>
+                    <a href="@Url.Action("DangKy", "DangNhap")" class="auth-link register-link">
+                        <i class="fas fa-user-plus auth-icon"></i>
+                        <span class="auth-text">Đăng ký</span>
+                    </a>
+                </div>
+            </div>
+        }
+        </div>
+        <!-- Menu Icon -->
+        <button class="menu-toggle" id="menu-toggle" style="color : white ">
+            <ion-icon id="menu-icon" name="menu-sharp"></ion-icon><!-- Biểu tượng mặc định -->
+        </button>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            @if (Context.Session.GetString("MaKhachHang") != null)
+            { 
+
+            <ul class="nav flex-column">
+                <nav>
+                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                        <img src="~/img/Poly food.png" alt="Poly Food" class="nav-logo" />
+                    </a>
+                </nav>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Gà">
+                        <ion-icon class="fas fa-drumstick-bite"></ion-icon> Gà
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Kem">
+                        <ion-icon name="ice-cream-outline"></ion-icon> Kem  
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Burger">
+                        <ion-icon name="fast-food-outline"></ion-icon> Burger
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Pizza">
+                        <ion-icon name="pizza-outline"></ion-icon> Pizza
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Khoai Tây">
+                        <ion-icon name="fast-food-outline"></ion-icon> Khoai Chiên
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Đồ Uống">
+                        <ion-icon name="beer-outline"></ion-icon> Nước Uống
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Combo">
+                        <ion-icon name="restaurant-outline"></ion-icon> Combo
+                    </a>
+                </li>
+                <li class="nav-item p-2">
+                    <a class="nav-link" asp-controller="DangNhap" asp-action="LienHe">
+                        <ion-icon name="call-outline"></ion-icon> Liên Hệ
+                    </a>
+                </li>
+            </ul>   
+            }
+            else if (Context.Session.GetString("MaNhanVien") != null){
+                <ul class="navbar-nav">
+                    <nav>
+                        <a class="navbar-brand">
+                            <img src="~/img/Poly food.png" alt="Poly Food" class="nav-logo" />
+                        </a>
+                    </nav>
+                    <li class="nav-item p-3">
+                        <a class="nav-link" href="@Url.Action("QuanLySanPham", "MonAns")">
+                            <i class="fas fa-cogs p-2"></i> Quản lý Sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item p-3">
+                        <a class="nav-link" href="@Url.Action("DanhSachKhachHang", "KhachHangs")">
+                            <i class="fas fa-users p-2"></i> Quản lý Khách hàng
+                        </a>
+                    </li>
+                    <li class="nav-item p-3">
+                        <a class="nav-link" href="@Url.Action("Index", "ThongKe")">
+                            <i class="fas fa-chart-line p-2"></i> Thống kê Đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item p-3">
+                        <a class="nav-link" href="@Url.Action("XacNhanDon", "HoaDons")">
+                            <i class="fas fa-check-circle p-2"></i> Xác nhận Đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item p-3">
+                        <a class="nav-link" href="@Url.Action("HoaDon", "HoaDons")">
+                            <i class="fas fa-file-invoice p-2"></i> Quản lý Hóa đơn
+                        </a>
+                    </li>
+                    <li class="nav-item p-3">
+                        <a class="nav-link" href="@Url.Action("ThemHoaDonMoi", "HoaDons")">
+                            <i class="fas fa-file-invoice p-2"></i> Thanh Toán Trực Tiếp 
+                        </a>
+                    </li>
+                </ul>
+            }
+            else{
+                <ul class="nav flex-column">
+                    <nav>
+                        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                            <img src="~/img/Poly food.png" alt="Poly Food" class="nav-logo" />
+                        </a>
+                    </nav>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Gà">
+                            <ion-icon class="fas fa-drumstick-bite"></ion-icon> Gà
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Kem">
+                            <ion-icon name="ice-cream-outline"></ion-icon> Kem
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Burger">
+                            <ion-icon name="fast-food-outline"></ion-icon> Burger
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Pizza">
+                            <ion-icon name="pizza-outline"></ion-icon> Pizza
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Khoai Tây">
+                            <ion-icon name="fast-food-outline"></ion-icon> Khoai Chiên
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Đồ Uống">
+                            <ion-icon name="beer-outline"></ion-icon> Nước Uống
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="MonAns" asp-action="Index" asp-route-LoaiSanPham="Combo">
+                            <ion-icon name="restaurant-outline"></ion-icon> Combo
+                        </a>
+                    </li>
+                    <li class="nav-item p-2">
+                        <a class="nav-link" asp-controller="DangNhap" asp-action="LienHe">
+                            <ion-icon name="call-outline" ></ion-icon> Liên Hệ
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content p-5">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    @{
+        var isLoginPage = Context.Request.Path.StartsWithSegments("/DangNhap/Login");
+    }
+
+    @if (!isLoginPage)
+    {   
+        <footer class="footer">
+            <div class="footer-container p-2">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3><i class="fas fa-utensils food-icon"></i>About Us</h3>
+                        <p>Delicious Bites is your go-to destination for mouth-watering food delivered right to your doorstep. We pride ourselves on fresh ingredients and authentic flavors.</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-section">
+                        <h3><i class="fas fa-hamburger food-icon"></i>Our Menu</h3>
+                        <ul class="footer-links">
+                            <li><a href="#">Appetizers</a></li>
+                            <li><a href="#">Main Courses</a></li>
+                            <li><a href="#">Desserts</a></li>
+                            <li><a href="#">Beverages</a></li>
+                            <li><a href="#">Special Offers</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-section">
+                        <h3><i class="fas fa-info-circle food-icon"></i>Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Order Online</a></li>
+                            <li><a href="#">Reservations</a></li>
+                            <li><a href="#">Gallery</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-section">
+                        <h3><i class="fas fa-envelope food-icon"></i>Contact Us</h3>
+                        <div class="contact-info">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Food Street, Tasty City, TC 12345</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="fas fa-phone"></i>
+                            <span>(123) 456-7890</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@deliciousbites.com</span>
+                        </div>
+                        <div class="contact-info">
+                            <i class="fas fa-clock"></i>
+                            <span>Mon-Sun: 10:00 AM - 10:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="footer-section">
+                        <h3><i class="fas fa-bell food-icon"></i>Subscribe</h3>
+                        <p>Subscribe to our newsletter for special deals and offers!</p>
+                        <form id="newsletter-form" class="newsletter-form">
+                            <input type="email" placeholder="Enter your email" required>
+                            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                        <div id="success-message" class="success-message">
+                            Thank you for subscribing!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; <span id="current-year"></span> Delicious Bites. All rights reserved. | <a href="#" style="color: #b0b0b0;">Privacy Policy</a> | <a href="#" style="color: #b0b0b0;">Terms of Service</a></p>
+                </div>
+            </div>
+        </footer>
+    }
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuIcon = document.getElementById('menu-icon'); // Lấy icon
+            const mainContent = document.querySelector('.main-content');
+
+            // Kiểm tra trạng thái sidebar từ localStorage
+            if (localStorage.getItem('sidebarActive') === 'true') {
+                sidebar.classList.add('active');
+                mainContent.style.marginLeft = '250px';
+                menuIcon.style.color = 'white'; // Mở: icon trắng
+            } else {
+                menuIcon.style.color = 'black'; // Tắt: icon đen
+            }
+
+            // Toggle trạng thái sidebar khi nhấn vào menu-toggle
+            menuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+
+                if (sidebar.classList.contains('active')) {
+                    mainContent.style.marginLeft = '250px';
+                    menuIcon.style.color = 'white'; // Mở: icon trắng
+                    localStorage.setItem('sidebarActive', 'true');
+                } else {
+                    mainContent.style.marginLeft = '0';
+                    menuIcon.style.color = 'black'; // Tắt: icon đen
+                    localStorage.setItem('sidebarActive', 'false');
+                }
+            });
+        });
+        // Tạo kết nối với Hub
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub") // Đường dẫn SignalR Hub
+            .build();
+
+        // Lắng nghe sự kiện 'receiveNotification' từ Hub
+        connection.on("receiveNotification", function (message) {
+            alert(message);  // Hiển thị thông báo lên UI, bạn có thể thay đổi thành hiển thị khác
+        });
+
+        // Kết nối với SignalR Hub
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+    </script>
+</body>
+</html>

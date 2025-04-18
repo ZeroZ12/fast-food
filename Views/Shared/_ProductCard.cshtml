@@ -1,0 +1,269 @@
+﻿@model MonAn
+
+<div class="col-md-4 col-sm-6 mb-4">
+    <div class="product-card shadow-sm">
+        <a asp-action="Details" asp-controller="MonAns" asp-route-id="@Model.MaMon" class="product-link">
+            <div class="product-img-container">
+                <div class="product-img" style="background-image: url('@Url.Content(!string.IsNullOrEmpty(Model.HinhAnh) ? "~/" + Model.HinhAnh : "~/img/monan/default.png")');">
+                </div>
+                <div class="product-overlay">
+                    <div class="overlay-content">
+                        <span>Xem chi tiết</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="product-category">@Model.LoaiSanPham</div>
+                <h5 class="card-title">@Model.TenMon</h5>
+                <div class="product-price">
+                    <span class="price-current">@Model.Gia.ToString("N0") VNĐ</span>
+                </div>
+            </div>
+        </a>
+
+        <div class="product-actions">
+            <button class="btn-add-cart" onclick="addToCart('@Model.MaMon', '@Model.TenMon', '@Model.Gia')">
+                <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background-color: white;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border: none;
+    }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    .product-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        flex: 1;
+    }
+
+    .product-img-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .product-img {
+        width: 100%;
+        height: 220px;
+        background-size: cover;
+        background-position: center;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.1);
+    }
+
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+
+    .overlay-content {
+        color: white;
+        font-weight: bold;
+        padding: 8px 16px;
+        border: 2px solid white;
+        border-radius: 30px;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .card-body {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .product-category {
+        font-size: 0.8rem;
+        color: #666;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .card-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+        color: #333;
+        height: 2.4rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .product-price {
+        margin-top: auto;
+    }
+
+    .price-current {
+        color: #FF4500;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .product-actions {
+        padding: 0 15px 15px;
+    }
+
+    .btn-add-cart {
+        width: 100%;
+        padding: 10px;
+        background-color: #FF4500;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add-cart:hover {
+            background-color: #E03E00;
+        }
+
+    media (max-width: 767px) {
+        .product-img
+
+    {
+        height: 180px;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    }
+</style>
+
+<script>
+    function addToCart(id, name, price) {
+        event.preventDefault(); // Prevent navigation to details page
+
+        // Example AJAX call to add item to cart
+        $.ajax({
+            url: '@Url.Action("AddToCart", "GioHangs")',
+            type: 'POST',
+            data: {
+                maMon: id,
+                soLuong: 1
+            },
+            success: function(result) {
+                // Show success notification
+                showNotification(`Đã thêm ${name} vào giỏ hàng`);
+
+                // Update cart count in header (if you have one)
+                updateCartCount(result.cartCount);
+            },
+            error: function() {
+                showNotification('Có lỗi xảy ra. Vui lòng thử lại sau.', 'error');
+            }
+        });
+    }
+
+    function showNotification(message, type = 'success') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="${type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        // Add to document
+        document.body.appendChild(notification);
+
+        // Show notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    function updateCartCount(count) {
+        const cartBadge = document.querySelector('.cart-badge');
+        if (cartBadge) {
+            cartBadge.textContent = count;
+        }
+    }
+</script>
+
+<style>
+    /* Notification styles */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transform: translateX(120%);
+        transition: transform 0.3s ease;
+    }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+    .notification-content {
+        display: flex;
+        align-items: center;
+    }
+
+    .notification i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .notification.success i {
+        color: #4CAF50;
+    }
+
+    .notification.error i {
+        color: #F44336;
+    }
+</style>
